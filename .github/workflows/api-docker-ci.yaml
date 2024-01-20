@@ -31,6 +31,4 @@ jobs:
           file: ./BiroCalendar.Api/Dockerfile
           context: .
           push: true
-          tags: |
-            skornel02/birocalendar:latest
-            ghcr.io/skornel02/birocalendar:latest
+          tags: ghcr.io/skornel02/birocalendar:latest
