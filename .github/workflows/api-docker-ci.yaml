@@ -32,3 +32,4 @@ jobs:
           context: .
           push: true
           tags: ghcr.io/skornel02/birocalendar:latest
+          platforms: linux/amd64,linux/arm64
