@@ -55,6 +55,7 @@ app.MapHealthChecks("/health", new()
 
 app.MapAccountEndpoints();
 app.MapBiroAccountEndpoints();
+app.MapCalendarEndpoints();
 
 using (var scope = app.Services.CreateScope())
 {

@@ -1,5 +1,8 @@
 ﻿using BiroCalendar.Api.Persistance.Entities;
 using BiroCalendar.Shared.Dtos;
+using Ical.Net;
+using Ical.Net.CalendarComponents;
+using Ical.Net.DataTypes;
 
 namespace BiroCalendar.Api.Extensions;
 
@@ -44,4 +47,34 @@ public static class DtoMapper
 
     public static BiroTaskContainerDto ToContainerDto(this List<BiroTaskDto> tasks, DateTime lastAccessed)
         => new(lastAccessed, tasks);
+
+    public static Calendar ToCalendar(this ICollection<BiroRecord> tasks)
+    {
+        var calendar = new Calendar();
+        calendar.AddTimeZone("Europe/Budapest");
+        calendar.ProductId = "BiroCalendar";
+        
+        foreach (var task in tasks)
+        {
+            var startDate = new CalDateTime(task.TaskDueDate);
+            startDate.HasTime = false;
+
+            var endDate = new CalDateTime(task.TaskDueDate.AddDays(1));
+            endDate.HasTime = false;
+
+            calendar.Events.Add(new CalendarEvent()
+            {
+                Uid = task.Guid.ToString(),
+                IsAllDay = true,
+                DtStart = startDate,
+                DtEnd = endDate,
+                Created = new CalDateTime(task.FetchedAt),
+                LastModified = new CalDateTime(task.UpdatedAt),
+                Description = "Automatically imported from BiroCalendar",
+                Summary = $"[{task.ClassName}] {task.TaskName}"
+            });
+        }
+
+        return calendar;
+    }
 }

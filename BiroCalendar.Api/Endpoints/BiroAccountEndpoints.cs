@@ -3,9 +3,11 @@ using BiroCalendar.Api.Extensions;
 using BiroCalendar.Api.Persistance;
 using BiroCalendar.Api.Persistance.Entities;
 using BiroCalendar.Shared.Dtos;
+using Ical.Net.Serialization;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Text;
 
 namespace BiroCalendar.Api.Endpoints;
 
@@ -198,6 +200,40 @@ public static class BiroAccountEndpoints
             var records = await biroClient.FetchBiroRecords(biroAccount);
 
             return TypedResults.Ok(records.ToDto().ToContainerDto(biroAccount.LastAccessed ?? DateTime.MinValue));
+        });
+
+        group.MapPost("/{id}/calendar-key", async Task<Results<Created<string>, NotFound, UnauthorizedHttpResult>> (
+            int id,
+            AppDbContext db,
+            HttpContext context,
+            BiroClient biroClient) =>
+        {
+            var account = await db.GetAccountFromEmail(context.GetEmailAddress());
+
+            if (account is null)
+            {
+                return TypedResults.Unauthorized();
+            }
+
+            var biroAccount = await db.BiroAccounts.AsNoTracking()
+                .Where(_ => _.AccountId == account.Id)
+                .FirstOrDefaultAsync(model => model.Id == id);
+
+            if (biroAccount is null)
+            {
+                return TypedResults.NotFound();
+            }
+
+            var calendarAccessKey = new CalendarAccessKey()
+            {
+                Id = Guid.NewGuid(),
+                BiroAccountId = account.Id,
+            };
+
+            await db.AddAsync(calendarAccessKey);
+            await db.SaveChangesAsync();
+
+            return TypedResults.Created($"/calendar?calendarKey={calendarAccessKey.Id}", calendarAccessKey.Id.ToString());
         });
     }
 }

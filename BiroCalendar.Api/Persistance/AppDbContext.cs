@@ -12,6 +12,8 @@ public class AppDbContext : DbContext
 
     public DbSet<BiroRecord> Records { get; set; }
 
+    public DbSet<CalendarAccessKey> CalendarAccessKeys { get; set; }
+
     public AppDbContext(DbContextOptions options) : base(options)
     {
 

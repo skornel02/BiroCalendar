@@ -99,6 +99,7 @@ public class BiroClient
                 {
                     var record = new BiroRecord
                     {
+                        Guid = Guid.NewGuid(),
                         ClassName = className,
                         TaskName = taskName,
                         TaskDueDate = taskDueDate,
@@ -117,8 +118,8 @@ public class BiroClient
 
             foreach (var seenRecord in seenExistingRecords)
             {
-                updateOutdateFilter.And(_ => _.Id != seenRecord.Id);
-                updateNotOutdatedFilter.Or(_ => _.Id == seenRecord.Id);
+                updateOutdateFilter = updateOutdateFilter.And(_ => _.Id != seenRecord.Id);
+                updateNotOutdatedFilter = updateNotOutdatedFilter.Or(_ => _.Id == seenRecord.Id);
             }
 
             await _context.Records
