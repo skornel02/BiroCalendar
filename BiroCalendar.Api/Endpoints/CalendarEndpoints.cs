@@ -42,7 +42,9 @@ public static class CalendarEndpoints
             serializer.Serialize(calendar, memoryStream, Encoding.UTF8);
             memoryStream.Position = 0;
 
-            return TypedResults.Stream(memoryStream, contentType: "text/calendar", fileDownloadName: "calendar.ics");
+            return TypedResults.Stream(memoryStream, 
+                fileDownloadName: "calendar.ics", 
+                contentType: "text/calendar");
         });
 
         group.MapDelete("/", async Task<Results<NoContent, NotFound>> (
