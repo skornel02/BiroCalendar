@@ -147,7 +147,7 @@ public static class BiroAccountEndpoints
             int id,
             AppDbContext db,
             HttpContext context,
-            [FromQuery] bool showAll = false) =>
+            [FromQuery] bool showAll) =>
         {
             var account = await db.GetAccountFromEmail(context.GetEmailAddress());
 
